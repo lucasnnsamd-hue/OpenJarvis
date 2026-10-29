@@ -105,7 +105,7 @@ def ensure_server() -> None:
     if server_up():
         return
     subprocess.Popen(
-        ["uv", "run", "jarvis", "start"], cwd=ROOT,
+        ["uv", "run", "jarvis", "start", "-e", "ollama"], cwd=ROOT,
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
     )
@@ -130,7 +130,7 @@ def main() -> None:
     play_jingle()
     ensure_server()
     webbrowser.open(URL)
-    sys.exit(subprocess.call(["uv", "run", "jarvis", "chat", "--voice", "--skip-runtime-panel"], cwd=ROOT))
+    sys.exit(subprocess.call(["uv", "run", "jarvis", "chat", "-e", "ollama", "--voice", "--skip-runtime-panel"], cwd=ROOT))
 
 
 if __name__ == "__main__":

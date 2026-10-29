@@ -23,6 +23,9 @@
                            — the server refuses to start unauthenticated
                            on a non-loopback bind.
       -ListenPort <int>    default: 8000
+      -Engine <name>       default: ollama. Passed as `jarvis serve -e`, so
+                           the server never silently falls back to another
+                           engine (e.g. nim) if this one is down at logon.
 
     Usage:
       powershell -ExecutionPolicy Bypass -File jarvis-service.ps1 install
@@ -38,7 +41,8 @@ param(
 
     [string] $InstallRoot,
     [string] $ListenHost = '127.0.0.1',
-    [int]    $ListenPort = 8000
+    [int]    $ListenPort = 8000,
+    [string] $Engine = 'ollama'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -118,6 +122,7 @@ then re-run with -ListenHost 0.0.0.0.
     Write-Info "Registering scheduled task '$TaskName'..."
     Write-Info "  Working dir : $srcDir"
     Write-Info "  Listen      : $ListenHost`:$ListenPort"
+    Write-Info "  Engine      : $Engine"
     Write-Info "  User        : $env:USERNAME"
 
     # If a previous task exists, remove it first (idempotent install).
@@ -129,7 +134,7 @@ then re-run with -ListenHost 0.0.0.0.
 
     $action = New-ScheduledTaskAction `
         -Execute $uvPath `
-        -Argument "run jarvis serve --host $ListenHost --port $ListenPort" `
+        -Argument "run jarvis serve --host $ListenHost --port $ListenPort -e $Engine" `
         -WorkingDirectory $srcDir
 
     $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
